@@ -1,44 +1,56 @@
 # Advanced Asynchronous Backend System (Enterprise Core)
 
-## Executive Summary
-[cite_start]This project is a high-performance, non-blocking asynchronous security and user routing engine[cite: 5]. [cite_start]It is designed to handle concurrent connections efficiently, implement strict cryptographic token lifecycles, and utilize in-memory layers to prevent unauthorized usage without compromising request speeds[cite: 6]. 
+![Version](https://img.shields.io/badge/Version-1.4.2--Prod-blue.svg)
+![Python](https://img.shields.io/badge/Python-3.12%2B-brightgreen.svg)
+![FastAPI](https://img.shields.io/badge/FastAPI-Async-009688.svg)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Asyncpg-336791.svg)
+![Redis](https://img.shields.io/badge/Redis-In--Memory-DC382D.svg)
 
-[cite_start]The system focuses purely on execution and runtime optimization[cite: 7]. [cite_start]The architectural scope emphasizes a Zero-Trust Network Access with a Stateless/Stateful Hybrid approach[cite: 3].
+## 🚀 Executive Summary
+This repository contains a high-performance, non-blocking asynchronous security and user routing engine. Built purely for runtime execution and optimization, the system handles concurrent connections efficiently, enforces strict cryptographic token lifecycles, and implements a fast in-memory layer to block unauthorized usage with zero latency overhead. 
 
-## Key Engineering Features
-* [cite_start]**Asynchronous Execution Model:** Fully non-blocking I/O operations across all entry points, database reads/writes, and network caching layers[cite: 12].
-* [cite_start]**Connection Lifecycle Management:** Database and fast-storage connections are managed via application start/stop lifespans, avoiding per-request connection overhead[cite: 13].
-* [cite_start]**Dual-Token Cryptography:** Secure authentication leveraging short-lived Access tokens and long-lived Refresh tokens[cite: 15].
-* [cite_start]**Cryptographic Separation:** Tokens are signed using completely different cryptographic secrets to prevent unauthorized extensions[cite: 16].
-* [cite_start]**Stateful Token Invalidation:** Integrates a fast in-memory Redis layer to track logouts and instantly blacklist revoked tokens for their remaining lifespan[cite: 17, 18].
-* [cite_start]**Zero-Trust Dependency Injection:** Automated token extraction, blacklist validation, and active database context retrieval for downstream protected routes[cite: 19].
+The architecture strictly adheres to a **Zero-Trust Network Access** model utilizing a **Stateless/Stateful Hybrid** approach.
 
-## Technology Stack
-* **Framework:** FastAPI (Python 3.12)
-* **Database Engine:** PostgreSQL (Asyncpg driver)
-* **In-Memory Layer:** Redis (Asyncio client)
-* **Cryptography:** PyJWT (HS256 Standard), Passlib (Bcrypt)
-* **CI/CD Pipeline:** GitHub Actions
+## ⚙️ Core Engineering Features
 
-## Installation & Local Setup
+### 1. Asynchronous Execution Model
+* **Non-Blocking I/O:** All entry points, database transactions, and network caching layers operate on a single-thread loop worker model using asynchronous libraries.
+* **Pool Lifecycle Management:** Database engines and fast-storage systems initialize connection pools strictly tied to the application's startup and shutdown events, eliminating per-request connection bottlenecks.
 
-### 1. Prerequisites
-Ensure you have Python 3.12+, PostgreSQL, and a running Redis server installed on your system.
+### 2. High-Security Cryptography & Authentication
+* **Dual-Token Key Separation:** Implements distinct `Access` (short-lived) and `Refresh` (long-lived) tokens, mathematically signed with completely isolated cryptographic secrets via standard HS256 algorithms.
+* **Stateful Token Invalidation:** Integrates Redis as an ultra-fast in-memory layer to track session logouts. Revoked tokens are instantly blacklisted for their remaining valid lifespan.
+* **Zero-Trust Dependency Injection:** Downstream routes utilize a secure injection system that autonomously extracts tokens, verifies algorithmic signatures, checks the Redis blacklist, and injects the validated user context.
 
-### 2. Clone the Repository
-git clone https://github.com/yourusername/core-auth-system.git
+## 🛠️ Technology Stack
+* **Core Framework:** FastAPI
+* **Database & ORM:** PostgreSQL, `asyncpg`
+* **Caching & Blacklisting:** Redis, `redis.asyncio`
+* **Security:** `PyJWT` (Tokens), `passlib[bcrypt]` (Password Hashing)
+* **Testing & CI/CD:** `pytest-asyncio`, `httpx`, GitHub Actions
+
+## 💻 Local Installation & Setup
+
+### Prerequisites
+* Python 3.12+
+* PostgreSQL server running locally
+* Redis server running locally
+
+### 1. Clone & Install
+```bash
+git clone [https://github.com/yourusername/core-auth-system.git](https://github.com/yourusername/core-auth-system.git)
 cd core-auth-system
-
-### 3. Install Dependencies
 pip install -r requirements.txt
+2. Environment Configuration
+Create a .env file in the root directory containing your secure cryptographic keys:
 
-### 4. Environment Variables
-Create a strictly named `.env` file in the root directory and add your secure keys:
-ACCESS_TOKEN_SECRET="your-secure-access-secret"
-REFRESH_TOKEN_SECRET="your-secure-refresh-secret"
+Code snippet
+ACCESS_TOKEN_SECRET="your-super-secure-access-key-here"
+REFRESH_TOKEN_SECRET="your-super-secure-refresh-key-here"
+3. Database Initialization
+Create a PostgreSQL database named core_auth_db and apply the core schema:
 
-### 5. Database Initialization
-Create a PostgreSQL database named `core_auth_db` and execute the following SQL schema:
+SQL
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
@@ -47,27 +59,31 @@ CREATE TABLE users (
     is_superuser BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-
-### 6. Run the Server
+4. Run the Engine
+Bash
 uvicorn app.main:app --reload
+🧪 Testing Blueprint & Verification
+The system provides fully interactive API documentation at http://127.0.0.1:8000/docs. To verify the core engine, execute the following end-to-end sequence:
 
-## API Documentation & Verification Methods
-Once the server is running, navigate to `http://127.0.0.1:8000/docs` to access the interactive Swagger UI. [cite_start]The system responses strictly adhere to predefined JSON object schemas[cite: 26]. 
+Registration: Submit credentials to /users/register to receive a highly structured UserRegistrationResponse.
 
-### End-to-End Testing Sequence
-1. [cite_start]**The Registration Step:** Submit a new email and password to receive a validated `UserRegistrationResponse`[cite: 42, 43].
-2. [cite_start]**The Authentication Step:** Submit credentials to receive separate access and refresh tokens in a `TokenExchangeResponse` layout[cite: 45, 46].
-3. [cite_start]**The Security Access Step:** Utilize the access token to fetch protected user profile metrics cleanly[cite: 47, 48].
-4. [cite_start]**The Rotation Step:** Submit the refresh token to generate a fresh session payload securely[cite: 49, 50].
-5. [cite_start]**The Session Revocation Step:** Send the active token to the logout endpoint to trigger the fast in-memory blacklist[cite: 51, 52].
-6. [cite_start]**The Zero-Trust Post-Validation Step:** Attempt to reuse a blacklisted token to verify instant downstream logic protection (HTTP 401 Unauthorized)[cite: 53, 54].
+Authentication: Submit credentials to /auth/login to obtain dual-signed tokens (TokenExchangeResponse).
 
-## Automated Pipeline Specification
-[cite_start]This repository enforces a continuous quality gate via GitHub Actions[cite: 56]. [cite_start]Code changes will not be merged into the main branch if any component fails, returns an error status code, or drops below security standards[cite: 61, 62].
-* [cite_start]**Environment Spawn:** Standard runners and background dependencies (PostgreSQL, Redis) must clear health checks within 10 seconds[cite: 58].
-* [cite_start]**Linter Engine:** Enforces zero syntax errors and strict adherence to PEP8 standards[cite: 58].
-* [cite_start]**Static Security Audits:** Blocks builds containing hardcoded credentials or weak cryptography[cite: 58].
-* [cite_start]**Asynchronous Suites:** Mandates 100% test suite completion using non-blocking network calls[cite: 58].
+Security Access: Authorize the Swagger UI using the access token and cleanly fetch protected metrics from /users/me.
 
----
-**Author:** Muhammad Zayab Ansari
+Token Rotation: Submit the refresh token to /auth/refresh to securely generate a new token pair without re-authenticating.
+
+Session Revocation: Hit the /auth/logout endpoint to instantly write the active access token's fingerprint to the Redis blacklist.
+
+Zero-Trust Post-Validation: Re-attempt the /users/me endpoint with the blacklisted token to confirm an instant HTTP 401 Unauthorized block.
+
+🛡️ CI/CD Pipeline Specification
+Code integrity is enforced via a strict GitHub Actions automated pipeline. Commits cannot be merged if they fail any of the following quality gates:
+
+Environment Spawn: Parallel instantiation of isolated Postgres and Redis containers passing sub-10-second health checks.
+
+Linter Engine: Strict PEP8 compliance checks via flake8 with zero syntax errors permitted.
+
+Static Security Audits: Deep repository scans using bandit (SAST) blocking any hardcoded credentials or weak cryptographic bindings.
+
+Asynchronous Suites: 100% test pass rate via pytest executing entirely non-blocking integration tests across all lifecycle events.
