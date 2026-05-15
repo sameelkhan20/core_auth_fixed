@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+asyncpg          # Async PostgreSQL driver
+redis            # Async Redis client for fast memory layer
+PyJWT            # Standard cryptographic token creation
+passlib[bcrypt]  # Password hashing
+python-dotenv    # .env file se environment variables load karne ke liye
+pytest           # Testing framework
+pytest-asyncio   # For automated async testing pipeline
+httpx            # Async HTTP client for tests
+anyio            # Async backend for pytest-asyncio
