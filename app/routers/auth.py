@@ -72,7 +72,8 @@ async def logout(request: Request, creds = Depends(security_scheme)):
     return StandardActionResponse(detail="Revocation complete")
 
 @router.post("/refresh", response_model=TokenExchangeResponse)
-async def refresh_session(request_data: TokenRefreshRequest, request: Request):
+# Pehle Request, baad mein body — yeh theek karo:
+async def refresh_session(request: Request, request_data: TokenRefreshRequest):
     """
     The Rotation Step: Verify refresh signature and return fresh tokens 
     without forcing re-login[cite: 49, 50].
