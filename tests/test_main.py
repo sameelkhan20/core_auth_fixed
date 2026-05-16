@@ -20,8 +20,9 @@ from app.main import app
 
 @pytest_asyncio.fixture(scope="session")
 async def client():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
-        yield ac
+    async with app.router.lifespan_context(app):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
+            yield ac
 
 TEST_EMAIL    = "testuser_ci@example.com"
 TEST_PASSWORD = "StrongPass123!"
@@ -142,9 +143,9 @@ async def test_refresh_token(client):
     """Spec 4.4 — The Rotation Step"""
     assert "refresh" in tokens, "Login test pehle run karo"
 
-    response = await client.post("/auth/refresh", headers={
-        "Authorization": f"Bearer {tokens['refresh']}"
-    })
+    response = await client.post("/auth/refresh", json={
+            "refresh_token": tokens['refresh']
+        })
     assert response.status_code == 200
 
     data = response.json()
@@ -165,8 +166,8 @@ async def test_access_token_cannot_refresh(client):
     assert "access" in tokens, "Login test pehle run karo"
 
     response = await client.post("/auth/refresh", headers={
-        "Authorization": f"Bearer {tokens['access']}"
-    })
+            "Authorization": f"Bearer {tokens['access']}"
+        })  
     assert response.status_code == 401
 
 
