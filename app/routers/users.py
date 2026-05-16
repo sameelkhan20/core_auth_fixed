@@ -6,7 +6,8 @@ from app.dependencies import get_current_user
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
-@router.post("/register", response_model=UserRegistrationResponse, status_code=status.HTTP_201_CREATED)
+@router.post("/register", response_model=UserRegistrationResponse,
+             status_code=status.HTTP_201_CREATED)
 async def register_user(user: UserCreate, request: Request):
     """
     Naya user register karo.
@@ -35,7 +36,9 @@ async def register_user(user: UserCreate, request: Request):
     try:
         new_user_record = await db_pool.fetchrow(insert_query, user.email, hashed_pwd)
     except Exception:
-        raise HTTPException(status_code=500, detail="Database operation failed")
+        raise HTTPException(
+            status_code=500,
+            detail="Database operation failed")
 
     return UserRegistrationResponse(**dict(new_user_record))
 
