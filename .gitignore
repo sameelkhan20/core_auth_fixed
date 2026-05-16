@@ -1,0 +1,19 @@
+# Environments
+.venv/
+venv/
+
+# Security
+.env
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Pytest
+.pytest_cache/
+
+# OS Files
+.DS_Store
+Thumbs.db
