@@ -3,7 +3,8 @@ uvicorn
 asyncpg          # Async PostgreSQL driver
 redis            # Async Redis client for fast memory layer
 PyJWT            # Standard cryptographic token creation
-passlib[bcrypt]  # Password hashing
+passlib==1.7.4
+bcrypt==4.0.1 # Password hashing
 python-dotenv    # .env file se environment variables load karne ke liye
 pytest           # Testing framework
 pytest-asyncio   # For automated async testing pipeline
